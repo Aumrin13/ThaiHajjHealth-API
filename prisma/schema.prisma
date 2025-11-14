@@ -1,0 +1,361 @@
+// This is your Prisma schema file
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mysql"
+  url      = env("DATABASE_URL")
+}
+
+enum UserRole {
+  ADMIN       // ผู้ดูแลระบบ
+  STAFF       // เจ้าหน้าที่บันทึก (รพ., รพ.สต.)
+  EXECUTIVE   // ผู้บริหาร
+  DOCTOR      // แพทย์ผู้ตรวจ
+}
+
+enum UserStatus {
+  ACTIVE
+  INACTIVE
+  SUSPENDED
+}
+
+enum Gender {
+  MALE
+  FEMALE
+}
+
+enum BloodType {
+  A_POSITIVE
+  A_NEGATIVE
+  B_POSITIVE
+  B_NEGATIVE
+  O_POSITIVE
+  O_NEGATIVE
+  AB_POSITIVE
+  AB_NEGATIVE
+}
+
+enum PilgrimStatus {
+  REGISTERED
+  READY
+  PENDING
+  CANCELLED
+}
+
+enum HealthCheckStatus {
+  SCHEDULED
+  COMPLETED
+  PENDING
+  OVERDUE
+}
+
+enum VaccinationStatus {
+  PENDING
+  COMPLETED
+  SCHEDULED
+}
+
+enum TrainingStatus {
+  NOT_STARTED
+  IN_PROGRESS
+  COMPLETED
+  FAILED
+}
+
+// =====================================================
+// User Management
+// =====================================================
+model User {
+  id           String     @id @default(uuid())
+  username     String     @unique
+  email        String     @unique
+  password     String
+  fullName     String
+  role         UserRole   @default(STAFF)
+  hospital     String?
+  phoneNumber  String?
+  status       UserStatus @default(ACTIVE)
+  lastLogin    DateTime?
+  refreshToken String?
+  createdAt    DateTime   @default(now())
+  updatedAt    DateTime   @updatedAt
+
+  // Relations
+  healthChecks   HealthCheck[]
+  vaccinations   Vaccination[]
+  auditLogs      AuditLog[]
+  notifications  Notification[]
+
+  @@index([email])
+  @@index([username])
+  @@map("users")
+}
+
+// =====================================================
+// Pilgrim Management
+// =====================================================
+model Pilgrim {
+  id          String        @id @default(uuid())
+  citizenId   String        @unique
+  fullName    String
+  nameEn      String?
+  birthDate   DateTime
+  age         Int
+  gender      Gender
+  bloodType   BloodType?
+  nationality String        @default("ไทย")
+  religion    String        @default("อิสลาม")
+  
+  // Address (stored as JSON)
+  address     Json
+  
+  // Contact (stored as JSON)
+  contact     Json
+  
+  // Emergency Contact (stored as JSON)
+  emergencyContact Json
+  
+  // Passport Info (stored as JSON)
+  passport    Json
+  
+  // Hajj Info (stored as JSON)
+  hajjInfo    Json
+  
+  status      PilgrimStatus @default(REGISTERED)
+  profileImage String?
+  notes       String?
+  
+  createdAt   DateTime      @default(now())
+  updatedAt   DateTime      @updatedAt
+
+  // Relations
+  healthChecks   HealthCheck[]
+  vaccinations   Vaccination[]
+  trainings      Training[]
+  medicalHistory MedicalHistory[]
+
+  @@index([citizenId])
+  @@index([fullName])
+  @@index([status])
+  @@map("pilgrims")
+}
+
+// =====================================================
+// Health Check
+// =====================================================
+model HealthCheck {
+  id              String            @id @default(uuid())
+  pilgrimId       String
+  pilgrim         Pilgrim           @relation(fields: [pilgrimId], references: [id], onDelete: Cascade)
+  
+  round           Int               // 1-4
+  checkDate       DateTime
+  examinerId      String
+  examiner        User              @relation(fields: [examinerId], references: [id])
+  hospital        String
+  
+  // Vital Signs (stored as JSON)
+  vitalSigns      Json
+  
+  // Lab Results
+  labResults      String?           @db.Text
+  labImage        String?
+  
+  // Medicine History
+  medicineHistory String?           @db.Text
+  medicineImage   String?
+  
+  assessment      String?           @db.Text
+  recommendations String?           @db.Text
+  
+  status          HealthCheckStatus @default(SCHEDULED)
+  nextCheckup     DateTime?
+  
+  createdAt       DateTime          @default(now())
+  updatedAt       DateTime          @updatedAt
+
+  @@index([pilgrimId])
+  @@index([checkDate])
+  @@index([status])
+  @@map("health_checks")
+}
+
+// =====================================================
+// Vaccination
+// =====================================================
+model VaccineType {
+  id          String   @id @default(uuid())
+  name        String
+  nameEn      String?
+  required    Boolean  @default(true)
+  doses       Int      @default(1)
+  description String?  @db.Text
+  
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  // Relations
+  vaccinations Vaccination[]
+
+  @@map("vaccine_types")
+}
+
+model Vaccination {
+  id                String            @id @default(uuid())
+  pilgrimId         String
+  pilgrim           Pilgrim           @relation(fields: [pilgrimId], references: [id], onDelete: Cascade)
+  
+  vaccineTypeId     String
+  vaccineType       VaccineType       @relation(fields: [vaccineTypeId], references: [id])
+  
+  vaccineDate       DateTime
+  batchNumber       String?
+  expiryDate        DateTime?
+  hospital          String
+  vaccinatorId      String?
+  vaccinator        User?             @relation(fields: [vaccinatorId], references: [id])
+  vaccinatorName    String
+  
+  sideEffects       String?           @db.Text
+  certificateImage  String?
+  
+  status            VaccinationStatus @default(COMPLETED)
+  nextDose          DateTime?
+  
+  createdAt         DateTime          @default(now())
+  updatedAt         DateTime          @updatedAt
+
+  @@index([pilgrimId])
+  @@index([vaccineTypeId])
+  @@index([vaccineDate])
+  @@map("vaccinations")
+}
+
+// =====================================================
+// Training/Courses
+// =====================================================
+model Course {
+  id                  String   @id @default(uuid())
+  courseName          String
+  courseNameEn        String?
+  category            String
+  description         String?  @db.Text
+  duration            Int      // in hours
+  instructor          String
+  required            Boolean  @default(false)
+  
+  startDate           DateTime
+  endDate             DateTime
+  schedule            String
+  location            String
+  
+  maxParticipants     Int
+  currentParticipants Int      @default(0)
+  
+  status              String   @default("OPEN")
+  
+  createdAt           DateTime @default(now())
+  updatedAt           DateTime @updatedAt
+
+  // Relations
+  trainings Training[]
+
+  @@index([startDate])
+  @@index([status])
+  @@map("courses")
+}
+
+model Training {
+  id            String         @id @default(uuid())
+  pilgrimId     String
+  pilgrim       Pilgrim        @relation(fields: [pilgrimId], references: [id], onDelete: Cascade)
+  
+  courseId      String
+  course        Course         @relation(fields: [courseId], references: [id])
+  
+  enrollDate    DateTime       @default(now())
+  completionDate DateTime?
+  
+  status        TrainingStatus @default(NOT_STARTED)
+  score         Int?
+  certificateImage String?
+  
+  notes         String?        @db.Text
+  
+  createdAt     DateTime       @default(now())
+  updatedAt     DateTime       @updatedAt
+
+  @@unique([pilgrimId, courseId])
+  @@index([pilgrimId])
+  @@index([courseId])
+  @@index([status])
+  @@map("trainings")
+}
+
+// =====================================================
+// Medical History
+// =====================================================
+model MedicalHistory {
+  id            String   @id @default(uuid())
+  pilgrimId     String
+  pilgrim       Pilgrim  @relation(fields: [pilgrimId], references: [id], onDelete: Cascade)
+  
+  condition     String
+  diagnosedDate DateTime?
+  medication    String?  @db.Text
+  notes         String?  @db.Text
+  
+  isActive      Boolean  @default(true)
+  
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+
+  @@index([pilgrimId])
+  @@map("medical_histories")
+}
+
+// =====================================================
+// Notifications
+// =====================================================
+model Notification {
+  id        String   @id @default(uuid())
+  userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  
+  title     String
+  message   String   @db.Text
+  type      String   // INFO, WARNING, ERROR, SUCCESS
+  isRead    Boolean  @default(false)
+  
+  createdAt DateTime @default(now())
+
+  @@index([userId])
+  @@index([isRead])
+  @@map("notifications")
+}
+
+// =====================================================
+// Audit Log
+// =====================================================
+model AuditLog {
+  id         String   @id @default(uuid())
+  userId     String?
+  user       User?    @relation(fields: [userId], references: [id], onDelete: SetNull)
+  
+  action     String   // CREATE, UPDATE, DELETE, LOGIN, LOGOUT
+  entity     String   // User, Pilgrim, HealthCheck, etc.
+  entityId   String?
+  changes    Json?
+  
+  ipAddress  String?
+  userAgent  String?
+  
+  createdAt  DateTime @default(now())
+
+  @@index([userId])
+  @@index([entity])
+  @@index([createdAt])
+  @@map("audit_logs")
+}
