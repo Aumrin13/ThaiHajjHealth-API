@@ -53,46 +53,14 @@ app.get('/', (_req: Request, res: Response) => {
     description: 'Backend API for managing Thai Hajj pilgrims health records and documentation',
     status: 'running',
     timestamp: new Date().toISOString(),
-    endpoints: {
-      authentication: {
-        login: 'POST /api/auth/login',
-        register: 'POST /api/auth/register',
-        refreshToken: 'POST /api/auth/refresh-token',
-        logout: 'POST /api/auth/logout',
-        getProfile: 'GET /api/auth/me',
-        changePassword: 'PUT /api/auth/change-password',
-      },
-      users: {
-        list: 'GET /api/users',
-        getById: 'GET /api/users/:id',
-        create: 'POST /api/users (Admin only)',
-        update: 'PUT /api/users/:id (Admin only)',
-        updateRole: 'PUT /api/users/:id/role (Admin only)',
-        updateStatus: 'PUT /api/users/:id/status (Admin only)',
-        delete: 'DELETE /api/users/:id (Admin only)',
-      },
-      utility: {
-        health: 'GET /health',
-        docs: 'GET /api/docs',
-        swagger: 'GET /api-docs (Interactive API Documentation)',
-      }
-    },
     documentation: {
       swagger: '/api-docs',
       api: '/api/docs',
-      readme: 'https://github.com/Aumrin13/ThaiHajjHealth-API/blob/main/README.md',
-      deployment: 'https://github.com/Aumrin13/ThaiHajjHealth-API/blob/main/DEPLOYMENT.md',
     },
     contact: {
       organization: 'ศูนย์บริหารการพัฒนาสุขภาพจังหวัดชายแดนภาคใต้ (ศบ.สต)',
       email: 'support@southhealthcenter.com',
-    },
-    roles: [
-      { role: 'ADMIN', description: 'ผู้ดูแลระบบ - Full access' },
-      { role: 'STAFF', description: 'เจ้าหน้าที่บันทึก - รพ., รพ.สต.' },
-      { role: 'EXECUTIVE', description: 'ผู้บริหาร - View reports only' },
-      { role: 'DOCTOR', description: 'แพทย์ผู้ตรวจ - Medical examinations' },
-    ]
+    }
   });
 });
 
