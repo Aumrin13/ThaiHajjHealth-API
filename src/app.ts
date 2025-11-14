@@ -3,15 +3,24 @@ import cors from 'cors';
 import helmet from 'helmet';
 import morgan from 'morgan';
 import rateLimit from 'express-rate-limit';
+import swaggerUi from 'swagger-ui-express';
 import { config } from './config';
 import logger from './config/logger';
 import { errorHandler } from './middleware/error.middleware';
+import { swaggerSpec } from './config/swagger';
 
 // Import routes
 import authRoutes from './routes/auth.routes';
 import usersRoutes from './routes/users.routes';
 
 const app: Express = express();
+
+// Swagger UI
+app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerSpec, {
+  explorer: true,
+  customCss: '.swagger-ui .topbar { display: none }',
+  customSiteTitle: 'Thai Hajj Health API Docs',
+}));
 
 // Security middleware
 app.use(helmet());
@@ -65,9 +74,11 @@ app.get('/', (_req: Request, res: Response) => {
       utility: {
         health: 'GET /health',
         docs: 'GET /api/docs',
+        swagger: 'GET /api-docs (Interactive API Documentation)',
       }
     },
     documentation: {
+      swagger: '/api-docs',
       api: '/api/docs',
       readme: 'https://github.com/Aumrin13/ThaiHajjHealth-API/blob/main/README.md',
       deployment: 'https://github.com/Aumrin13/ThaiHajjHealth-API/blob/main/DEPLOYMENT.md',
