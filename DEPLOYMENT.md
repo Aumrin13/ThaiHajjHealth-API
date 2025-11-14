@@ -225,7 +225,7 @@ curl http://api-thaihajjhealth.southhealthcenter.com/health
 ```bash
 curl -X POST http://api-thaihajjhealth.southhealthcenter.com/api/auth/login \
   -H "Content-Type: application/json" \
-  -d '{"email":"admin@thh.com","password":"admin123"}'
+  -d '{"username":"admin@thh.com","password":"admin123"}'
 ```
 
 ### Get Users (with token)
