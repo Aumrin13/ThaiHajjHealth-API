@@ -81,7 +81,7 @@ export const login = async (req: AuthRequest, res: Response) => {
 
 export const register = async (req: AuthRequest, res: Response) => {
   try {
-    const { username, email, password, fullName, role, hospital } = req.body;
+    const { username, email, password, fullName, role, hospital, phoneNumber, address, subdistrict, district, province, workplace, position } = req.body;
 
     const existingUser = await prisma.user.findFirst({
       where: {
@@ -103,6 +103,13 @@ export const register = async (req: AuthRequest, res: Response) => {
         fullName,
         role: role || 'STAFF',
         hospital,
+        phoneNumber,
+        address,
+        subdistrict,
+        district,
+        province,
+        workplace,
+        position,
       },
       select: {
         id: true,
@@ -111,6 +118,13 @@ export const register = async (req: AuthRequest, res: Response) => {
         fullName: true,
         role: true,
         hospital: true,
+        phoneNumber: true,
+        address: true,
+        subdistrict: true,
+        district: true,
+        province: true,
+        workplace: true,
+        position: true,
         createdAt: true,
       },
     });

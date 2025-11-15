@@ -103,6 +103,20 @@ router.get('/:id', getUserById);
  *         application/json:
  *           schema:
  *             $ref: '#/components/schemas/RegisterRequest'
+ *           example:
+ *             username: staff1
+ *             email: staff@thh.com
+ *             password: password123
+ *             fullName: นายทดสอบ ระบบ
+ *             role: STAFF
+ *             hospital: โรงพยาบาลปัตตานี
+ *             phoneNumber: 081-234-5678
+ *             address: 123 หมู่ 1 ถนนสุขภาพ
+ *             subdistrict: รูสะมิแล
+ *             district: เมืองปัตตานี
+ *             province: ปัตตานี
+ *             workplace: รพ.ปัตตานี
+ *             position: เจ้าหน้าที่
  *     responses:
  *       201:
  *         description: สร้างสำเร็จ
@@ -137,6 +151,18 @@ router.post('/', authorize('ADMIN'), validate(createUserSchema), createUser);
  *               hospital:
  *                 type: string
  *               phoneNumber:
+ *                 type: string
+ *               address:
+ *                 type: string
+ *               subdistrict:
+ *                 type: string
+ *               district:
+ *                 type: string
+ *               province:
+ *                 type: string
+ *               workplace:
+ *                 type: string
+ *               position:
  *                 type: string
  *     responses:
  *       200:

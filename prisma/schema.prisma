@@ -1,3 +1,60 @@
+model Subdistrict {
+  DISTRICT_ID     Int     @id @default(autoincrement())
+  DISTRICT_CODE   String  @db.VarChar(6)
+  DISTRICT_NAME   String  @db.VarChar(150)
+  AMPHUR_ID       Int
+  PROVINCE_ID     Int
+  GEO_ID          Int
+
+  @@map("b_district")
+}
+model AuditLog {
+  id         String   @id @db.VarChar(36)
+  userId     String?  @db.VarChar(36)
+  action     String   @db.VarChar(50)
+  entity     String?  @db.VarChar(50)
+  entityId   String?  @db.VarChar(36)
+  ipAddress  String?  @db.VarChar(45)
+  userAgent  String?  @db.VarChar(255)
+  createdAt  DateTime @default(now())
+  changes    String?  @db.Text
+
+  user       User?    @relation(fields: [userId], references: [id], onDelete: SetNull)
+}
+model Province {
+  PROVINCE_ID   Int     @id @default(autoincrement())
+  PROVINCE_CODE String  @db.VarChar(2)
+  PROVINCE_NAME String  @db.VarChar(150)
+  GEO_ID        Int
+}
+model Amphur {
+  AMPHUR_ID   Int     @id @default(autoincrement())
+  AMPHUR_CODE String  @db.VarChar(4)
+  AMPHUR_NAME String  @db.VarChar(150)
+  GEO_ID      Int
+  PROVINCE_ID Int
+}
+// =====================================================
+// Hospital Master
+// =====================================================
+model Hospital {
+  hos_id         Int     @id @default(autoincrement())
+  code_hos9      String  @db.VarChar(20)
+  code_hos5      String  @db.VarChar(20)
+  hos_type       String  @db.VarChar(50)
+  hos_name       String  @db.VarChar(100)
+  hos_address    String  @db.VarChar(200)
+  province_code  String  @db.VarChar(20)
+  province_name  String  @db.VarChar(50)
+  amphur_code    String  @db.VarChar(20)
+  amphur_name    String  @db.VarChar(50)
+  district_code  String  @db.VarChar(20)
+  district_name  String  @db.VarChar(50)
+  zipcode        String  @db.VarChar(10)
+  district_id    String  @db.VarChar(20)
+
+  @@map("b_hospital")
+}
 // This is your Prisma schema file
 generator client {
   provider = "prisma-client-js"
@@ -81,6 +138,12 @@ model User {
   refreshToken String?
   createdAt    DateTime   @default(now())
   updatedAt    DateTime   @updatedAt
+    address      String?    @db.VarChar(255)
+    subdistrict  String?    @db.VarChar(100)
+    district     String?    @db.VarChar(100)
+    province     String?    @db.VarChar(100)
+    workplace    String?    @db.VarChar(255)
+    position     String?    @db.VarChar(100)
 
   // Relations
   healthChecks   HealthCheck[]

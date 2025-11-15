@@ -12,6 +12,12 @@ import { swaggerSpec } from './config/swagger';
 // Import routes
 import authRoutes from './routes/auth.routes';
 import usersRoutes from './routes/users.routes';
+import hospitalRoutes from './routes/hospital.routes';
+import districtRoutes from './routes/district.routes';
+import amphurRoutes from './routes/amphur.routes';
+import provinceRoutes from './routes/province.routes';
+import auditlogRoutes from './routes/auditlog.routes';
+import subdistrictRoutes from './routes/subdistrict.routes';
 
 const app: Express = express();
 
@@ -228,6 +234,12 @@ app.get('/api/docs', (_req: Request, res: Response) => {
 // API routes
 app.use('/api/auth', authRoutes);
 app.use('/api/users', usersRoutes);
+app.use('/api', hospitalRoutes);
+app.use('/api', districtRoutes);
+app.use('/api', amphurRoutes);
+app.use('/api', provinceRoutes);
+app.use('/api', auditlogRoutes);
+app.use('/api', subdistrictRoutes);
 
 // 404 handler
 app.use((_req: Request, res: Response) => {

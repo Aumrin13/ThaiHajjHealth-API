@@ -50,6 +50,12 @@ export const getAllUsers = async (req: AuthRequest, res: Response) => {
           lastLogin: true,
           createdAt: true,
           updatedAt: true,
+          address: true,
+          subdistrict: true,
+          district: true,
+          province: true,
+          workplace: true,
+          position: true,
         },
         orderBy: { createdAt: 'desc' },
       }),
@@ -81,6 +87,12 @@ export const getUserById = async (req: AuthRequest, res: Response) => {
         lastLogin: true,
         createdAt: true,
         updatedAt: true,
+        address: true,
+        subdistrict: true,
+        district: true,
+        province: true,
+        workplace: true,
+        position: true,
       },
     });
 
@@ -97,7 +109,7 @@ export const getUserById = async (req: AuthRequest, res: Response) => {
 
 export const createUser = async (req: AuthRequest, res: Response) => {
   try {
-    const { username, email, password, fullName, role, hospital, phoneNumber } = req.body;
+    const { username, email, password, fullName, role, hospital, phoneNumber, address, subdistrict, district, province, workplace, position } = req.body;
 
     const existingUser = await prisma.user.findFirst({
       where: {
@@ -120,6 +132,12 @@ export const createUser = async (req: AuthRequest, res: Response) => {
         role: role || 'STAFF',
         hospital,
         phoneNumber,
+        address,
+        subdistrict,
+        district,
+        province,
+        workplace,
+        position,
       },
       select: {
         id: true,
@@ -130,6 +148,12 @@ export const createUser = async (req: AuthRequest, res: Response) => {
         hospital: true,
         phoneNumber: true,
         status: true,
+        address: true,
+        subdistrict: true,
+        district: true,
+        province: true,
+        workplace: true,
+        position: true,
         createdAt: true,
       },
     });
@@ -158,7 +182,7 @@ export const createUser = async (req: AuthRequest, res: Response) => {
 export const updateUser = async (req: AuthRequest, res: Response) => {
   try {
     const { id } = req.params;
-    const { fullName, hospital, phoneNumber } = req.body;
+    const { fullName, hospital, phoneNumber, address, subdistrict, district, province, workplace, position } = req.body;
 
     const user = await prisma.user.findUnique({ where: { id } });
 
@@ -172,6 +196,12 @@ export const updateUser = async (req: AuthRequest, res: Response) => {
         fullName,
         hospital,
         phoneNumber,
+        address,
+        subdistrict,
+        district,
+        province,
+        workplace,
+        position,
       },
       select: {
         id: true,
@@ -182,6 +212,12 @@ export const updateUser = async (req: AuthRequest, res: Response) => {
         hospital: true,
         phoneNumber: true,
         status: true,
+        address: true,
+        subdistrict: true,
+        district: true,
+        province: true,
+        workplace: true,
+        position: true,
         updatedAt: true,
       },
     });
@@ -192,7 +228,7 @@ export const updateUser = async (req: AuthRequest, res: Response) => {
         action: 'UPDATE',
         entity: 'User',
         entityId: id,
-        changes: { fullName, hospital, phoneNumber },
+        changes: { fullName, hospital, phoneNumber, address, subdistrict, district, province, workplace, position },
         ipAddress: req.ip,
         userAgent: req.headers['user-agent'],
       },
