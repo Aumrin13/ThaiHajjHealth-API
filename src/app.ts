@@ -18,7 +18,24 @@ const app: Express = express();
 // Swagger UI
 app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerSpec, {
   explorer: true,
-  customCss: '.swagger-ui .topbar { display: none }',
+  customCss: `
+    .swagger-ui .topbar { background: #00695c; }
+    .swagger-ui .topbar .topbar-wrapper img {
+      content: url('https://upload.wikimedia.org/wikipedia/commons/6/6b/Thai_Emblem_Garuda.svg');
+      height: 40px;
+      margin-right: 16px;
+    }
+    .swagger-ui .topbar .topbar-wrapper span { font-size: 1.2rem; color: #fff; }
+    .swagger-ui .info { margin-bottom: 30px; }
+    .swagger-ui .scheme-container { background: #e0f2f1; }
+    .swagger-ui .opblock.opblock-post { border-left: 5px solid #43a047; }
+    .swagger-ui .opblock.opblock-get { border-left: 5px solid #1976d2; }
+    .swagger-ui .opblock.opblock-put { border-left: 5px solid #ffa000; }
+    .swagger-ui .opblock.opblock-delete { border-left: 5px solid #e53935; }
+    .swagger-ui .btn.authorize { background: #00695c; }
+    .swagger-ui .info .title { font-size: 2rem; color: #00695c; }
+    .swagger-ui .info .base-url { color: #00695c; }
+  `,
   customSiteTitle: 'Thai Hajj Health API Docs',
 }));
 
