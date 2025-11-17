@@ -45,9 +45,9 @@ import { getAllHospitals, searchHospitals, getHospitalsByLocation } from '../con
  *                       amphur_name: { type: string }
  *                       district_name: { type: string }
  */
-router.get('/hospitals/by-location', getHospitalsByLocation);
 
 const router = Router();
+router.get('/hospitals/by-location', getHospitalsByLocation);
 
 /**
  * @swagger
