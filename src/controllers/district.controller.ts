@@ -11,7 +11,7 @@ export const getAllDistricts = async (req: Request, res: Response) => {
     if (search) {
       where.DISTRICT_NAME = { contains: String(search) };
     }
-    const districts = await prisma.district.findMany({
+    const districts = await prisma.subdistrict.findMany({
       where,
       orderBy: { DISTRICT_NAME: 'asc' },
     });
@@ -25,7 +25,7 @@ export const getAllDistricts = async (req: Request, res: Response) => {
 export const searchDistricts = async (req: Request, res: Response) => {
   const { query } = req.query;
   try {
-    const districts = await prisma.district.findMany({
+    const districts = await prisma.subdistrict.findMany({
       where: {
         OR: [
           { DISTRICT_NAME: { contains: String(query) } },
